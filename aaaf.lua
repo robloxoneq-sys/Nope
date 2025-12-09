@@ -339,9 +339,6 @@ TabAutoFarm:AddToggle("EquipWeaponToggle", {
 
 -----------------------------------------------------------------------------------
 local Section = TabAutoFarm:AddSection("Select Boss Type Pity 25")
--- =======================
--- Single Boss Farm Script
--- =======================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -366,6 +363,8 @@ local BossPositions = {
     ["Shigaraki"] = Vector3.new(562.9945068359375, 89.82760620117188, 489.7559814453125)
 }
 
+local originalGUIPos = nil
+
 local function PressKey(key)
     VirtualInput:SendKeyEvent(true, key, false, game)
     task.wait(0.1)
@@ -374,7 +373,7 @@ end
 
 local function PressEnter() PressKey(Enum.KeyCode.Return) end
 local function PressE() PressKey(Enum.KeyCode.E) end
-local function PressBackslash() PressKey(Enum.KeyCode.Backslash) end
+local function PressBackslash() PressKey(Enum.KeyCode.BackSlash) end
 
 local function SingleBoss_Find(name)
     if name == "Yuta" then
@@ -401,13 +400,13 @@ local function SingleBoss_Find(name)
             if npc and npc:FindFirstChild("Humanoid").Health > 0 then return npc end
         end
     elseif name == "Kaneki" then
-    local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
-    if folder then
-        local npc = folder:FindFirstChild("Kaneki")
-        if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
-            return npc
+        local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
+        if folder then
+            local npc = folder:FindFirstChild("Kaneki")
+            if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
+                return npc
+            end
         end
-    end
     elseif name == "Silver Fang" then
         local folder = workspace.Main.Characters["Rogue Town [Backside]"]:FindFirstChild("Boss")
         if folder then
@@ -447,21 +446,16 @@ end
 
 local function Akaza_Spawn()
     if not SingleBoss_Enabled then return end
-    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then return end
-    local hrp = plr.Character.HumanoidRootPart
-    hrp.CFrame = CFrame.new(481.75, 2.65, -626.47)
 
-    local npc = workspace:FindFirstChild("Main") and workspace.Main.NPCs:FindFirstChild("Boss Spawn1")
-    if npc and npc:FindFirstChild("{}") then
-        npc["{}"].HoldDuration = 0
-    end
+    local bossUI = plr:WaitForChild("PlayerGui"):WaitForChild("Button"):WaitForChild("Boss Spawn")
+    bossUI.Visible = true
 
-    PressE()
-    task.wait(0.2)
+    if not originalGUIPos then originalGUIPos = bossUI.Position end
+    bossUI.Position = UDim2.new(0.5,0,0.1,0)
 
     local selectBtn = pcall(function()
-        return plr.PlayerGui.Button["Boss Spawn"].Frame[AkazaBoss].Button
-    end) and plr.PlayerGui.Button["Boss Spawn"].Frame[AkazaBoss].Button or nil
+        return bossUI.Frame[AkazaBoss].Button
+    end) and bossUI.Frame[AkazaBoss].Button or nil
 
     if selectBtn then
         GuiService.SelectedObject = selectBtn
@@ -469,11 +463,14 @@ local function Akaza_Spawn()
         task.wait(0.2)
     end
 
-    local spawnBtn = plr.PlayerGui.Button["Boss Spawn"].Spawn:FindFirstChild("Button")
+    local spawnBtn = bossUI:FindFirstChild("Spawn") and bossUI.Spawn:FindFirstChild("Button")
     if spawnBtn then
         GuiService.SelectedObject = spawnBtn
         PressEnter()
     end
+
+    task.wait()
+    PressBackslash()
 end
 
 local function Akaza_AttackLoop(HRP)
@@ -567,6 +564,7 @@ function Event:findCore()
     return AllCores
 end
 
+-- Loop ฟาร์ม Boss
 local function SingleBoss_Loop(HRP)
     while SingleBoss_Enabled do
         while checkPity() < 25 and SingleBoss_Enabled do
@@ -680,8 +678,18 @@ TabAutoFarm:AddToggle("SingleBoss_Toggle", {
     Default = false,
     Callback = function(state)
         SingleBoss_Enabled = state
+
+        local bossUI = plr:WaitForChild("PlayerGui"):WaitForChild("Button"):WaitForChild("Boss Spawn")
         if state then
+            if not originalGUIPos then originalGUIPos = bossUI.Position end
+            bossUI.Position = UDim2.new(0.5, 0, 0.1, 0)
+            bossUI.Visible = true
             SingleBoss_Start()
+        else
+            if originalGUIPos then
+                bossUI.Position = originalGUIPos
+            end
+            bossUI.Visible = false
         end
     end
 })
@@ -793,8 +801,14 @@ local BossList = {
     "Silver Fang"
 }
 
+---------------------------------------------------------------------
+-- 🔥 ระบบฟาร์มใหม่: Yuta → pity → SJW/Silver Fang
+---------------------------------------------------------------------
 local function FarmBosses(hrp)
 
+    -------------------------------------------------------
+    -- 1) เช็ก Yuta ก่อนเสมอ
+    -------------------------------------------------------
     local yuta = FindBoss("Yuta")
     if yuta then
         if yuta:FindFirstChild("HumanoidRootPart") then
@@ -804,8 +818,13 @@ local function FarmBosses(hrp)
 
         AttackBoss(yuta, hrp)
 
+        -- 🎯 หลังจากฆ่า Yuta → กลับไปฟาร์ม pity
         return "YUTA_DONE"
     end
+
+    -------------------------------------------------------
+    -- 2) ถ้าไม่มี Yuta → ไปเช็ก SJW / Silver Fang
+    -------------------------------------------------------
     for _, name in ipairs(BossList) do
         if name ~= "Yuta" then
             local npc = FindBoss(name)
@@ -821,6 +840,9 @@ local function FarmBosses(hrp)
         end
     end
 
+    -------------------------------------------------------
+    -- 3) ไม่มีบอสเลย → กลับไปฟาร์ม pity
+    -------------------------------------------------------
     return "NONE"
 end
 
@@ -830,10 +852,13 @@ local function StartAuto()
 
         while AutoFarm do
 
+            -- 1) ฟาร์ม pity ให้เต็มก่อนเริ่มลูป
             PityLoop(hrp)
 
+            -- 2) ฟาร์มบอสตามลำดับใหม่
             local result = FarmBosses(hrp)
 
+            -- ถ้าฆ่า Yuta → ฟาร์ม pity ทันที
             if result == "YUTA_DONE" then
                 PityLoop(hrp)
             end
