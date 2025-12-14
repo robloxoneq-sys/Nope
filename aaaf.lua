@@ -861,7 +861,7 @@ local function StartAuto()
 end
 
 TabAutoFarm:AddToggle("AutoFarmBossAll", {
-    Title = "Auto Farm Yuta,SJW,Silver Fang",
+    Title = "Auto Farm Yuta,Anos,SJW,Silver Fang",
     Default = false,
     Callback = function(state)
         AutoFarm = state
@@ -1177,5 +1177,6 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
 
 
