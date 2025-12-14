@@ -399,10 +399,10 @@ local function SingleBoss_Find(name)
             local npc = folder:FindFirstChild("Sung Jin Woo")
             if npc and npc:FindFirstChild("Humanoid").Health > 0 then return npc end
         end
-    elseif name == "Kaneki" then
+    elseif name == "Anos" then
         local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
         if folder then
-            local npc = folder:FindFirstChild("Kaneki")
+            local npc = folder:FindFirstChild("Anos")
             if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
                 return npc
             end
@@ -667,7 +667,7 @@ TabAutoFarm:AddDropdown("SingleBoss_Dropdown", {
         "Silver Fang",
         "Abyssal Beast",
         "Shigaraki",
-        "Kaneki"
+        "Anos"
     },
     Default = "Select Boss",
     Callback = function(v) SingleBoss_Selected = v end
@@ -1186,5 +1186,4 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
 
