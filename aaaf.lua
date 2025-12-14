@@ -880,7 +880,7 @@ TabAutoFarm:AddToggle("AutoFarmBossAll", {
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local Count = 750
+local Count = 1200
 
 local function pressEnterAllAtOnce(totalPresses)
     for i = 1, totalPresses do
@@ -909,7 +909,7 @@ end
 task.spawn(function()
     while true do
         local currentSummonOrb = player:FindFirstChild("Inventory") and player.Inventory:FindFirstChild("Summon Orb")
-        if not currentSummonOrb or currentSummonOrb.Value < 10 then
+        if not currentSummonOrb or currentSummonOrb.Value < 100 then
             buySummonOrb()
         end
         task.wait(1)
@@ -1186,4 +1186,5 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
 
