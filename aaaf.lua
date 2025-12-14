@@ -268,8 +268,10 @@ local EquipEnabled = false
 local WeaponTypes = {
     ["Yuta's Katana"] = "Sword",
     ["Kaneki"] = "Combat",
+    ["Todoyaki"] = "Combat",
     ["Shadow"] = "Combat",
     ["Abyssbreaker"] = "Sword",
+    ["Venuzdonoa"] = "Sword",
     ["Solemn Lament"] = "Sword",
     ["Tensa Zangetsu"] = "Sword",
     ["Zangetsu"] = "Sword",
@@ -1118,7 +1120,6 @@ local allNPCs = {
 	workspace.Main.NPCs.Quests["3"],
 	workspace.Main.NPCs.Quests["4"],
 	workspace.Main.NPCs.Quests["5"],
-    workspace.Main.NPCs["Boss Spawn4"],
     workspace.Main.NPCs.Sword["Solemn Lament"],
 	workspace.Main.NPCs.Quests["6"],
     workspace.Main.NPCs.Craft,
@@ -1186,5 +1187,4 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
 
