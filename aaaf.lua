@@ -719,6 +719,10 @@ local function FindBoss(name)
         local folder = workspace.Main.Characters["Rogue Town [Backside]"]:FindFirstChild("Boss")
         return folder and folder:FindFirstChild("Silver Fang")
 
+    elseif name == "Anos" then
+        local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
+        return folder and folder:FindFirstChild("Anos")
+
     elseif name == AkazaBoss then
         local throne = workspace.Main.Characters:FindFirstChild("Throne Isle")
         return throne and throne.Boss:FindFirstChild(AkazaBoss)
@@ -799,18 +803,13 @@ end
 
 local BossList = {
     "Yuta",
+    "Anos",
     "Sung Jin Woo",
     "Silver Fang"
 }
 
----------------------------------------------------------------------
--- 🔥 ระบบฟาร์มใหม่: Yuta → pity → SJW/Silver Fang
----------------------------------------------------------------------
 local function FarmBosses(hrp)
 
-    -------------------------------------------------------
-    -- 1) เช็ก Yuta ก่อนเสมอ
-    -------------------------------------------------------
     local yuta = FindBoss("Yuta")
     if yuta then
         if yuta:FindFirstChild("HumanoidRootPart") then
@@ -824,9 +823,6 @@ local function FarmBosses(hrp)
         return "YUTA_DONE"
     end
 
-    -------------------------------------------------------
-    -- 2) ถ้าไม่มี Yuta → ไปเช็ก SJW / Silver Fang
-    -------------------------------------------------------
     for _, name in ipairs(BossList) do
         if name ~= "Yuta" then
             local npc = FindBoss(name)
@@ -842,9 +838,6 @@ local function FarmBosses(hrp)
         end
     end
 
-    -------------------------------------------------------
-    -- 3) ไม่มีบอสเลย → กลับไปฟาร์ม pity
-    -------------------------------------------------------
     return "NONE"
 end
 
@@ -854,13 +847,10 @@ local function StartAuto()
 
         while AutoFarm do
 
-            -- 1) ฟาร์ม pity ให้เต็มก่อนเริ่มลูป
             PityLoop(hrp)
 
-            -- 2) ฟาร์มบอสตามลำดับใหม่
             local result = FarmBosses(hrp)
 
-            -- ถ้าฆ่า Yuta → ฟาร์ม pity ทันที
             if result == "YUTA_DONE" then
                 PityLoop(hrp)
             end
@@ -1187,4 +1177,5 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
 
