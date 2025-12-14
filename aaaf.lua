@@ -369,7 +369,7 @@ local originalGUIPos = nil
 
 local function PressKey(key)
     VirtualInput:SendKeyEvent(true, key, false, game)
-    task.wait(0.1)
+    task.wait()
     VirtualInput:SendKeyEvent(false, key, false, game)
 end
 
@@ -462,7 +462,7 @@ local function Akaza_Spawn()
     if selectBtn then
         GuiService.SelectedObject = selectBtn
         PressEnter()
-        task.wait(0.2)
+        task.wait()
     end
 
     local spawnBtn = bossUI:FindFirstChild("Spawn") and bossUI.Spawn:FindFirstChild("Button")
@@ -1177,6 +1177,3 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
-
-
