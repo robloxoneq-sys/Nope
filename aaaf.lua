@@ -266,6 +266,8 @@ local SelectedType = "Combat"
 local EquipEnabled = false
 
 local WeaponTypes = {
+    ["Kafka's Katana"] = "Sword",
+    ["Herta's Hammer"] = "Sword",
     ["Yuta's Katana"] = "Sword",
     ["Kaneki"] = "Combat",
     ["Todoyaki"] = "Combat",
@@ -1186,4 +1188,3 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
