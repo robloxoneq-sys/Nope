@@ -463,7 +463,7 @@ local function Akaza_Spawn()
     bossUI.Visible = true
 
     if not originalGUIPos then originalGUIPos = bossUI.Position end
-    bossUI.Position = UDim2.new(0.5,0,0.1,0)
+    bossUI.Position = UDim2.new(0.8, 0, 0.1, 0)
 
     local selectBtn = pcall(function()
         return bossUI.Frame[AkazaBoss].Button
@@ -695,7 +695,7 @@ TabAutoFarm:AddToggle("SingleBoss_Toggle", {
         local bossUI = plr:WaitForChild("PlayerGui"):WaitForChild("Button"):WaitForChild("Boss Spawn")
         if state then
             if not originalGUIPos then originalGUIPos = bossUI.Position end
-            bossUI.Position = UDim2.new(0.5, 0, 0.1, 0)
+            bossUI.Position = UDim2.new(0.8, 0, 0.1, 0)
             bossUI.Visible = true
             SingleBoss_Start()
         else
