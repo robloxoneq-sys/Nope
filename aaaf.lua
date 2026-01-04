@@ -267,10 +267,15 @@ local EquipEnabled = false
 
 local WeaponTypes = {
     ["Kafka's Katana"] = "Sword",
+    ["Jin Mori"] = 'Combat',
+    ["Anti-Magic Sword"] = "Sword",
     ["Herta's Hammer"] = "Sword",
     ["Yuta's Katana"] = "Sword",
+    ["Divine Bident"] = "Sword",
     ["Kaneki"] = "Combat",
-    ["Todoyaki"] = "Combat",
+    ["Todoroki"] = "Combat",
+    ["Todoroki"] = "Combat",
+    ["Qin Shi"] = "Combat",
     ["Shadow"] = "Combat",
     ["Abyssbreaker"] = "Sword",
     ["Venuzdonoa"] = "Sword",
@@ -1188,3 +1193,4 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
