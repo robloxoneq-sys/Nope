@@ -411,7 +411,7 @@ local function SingleBoss_Find(name)
     elseif name == "Jin Mori" then
         local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
         if folder then
-            local npc = folder:FindFirstChild("Kafka")
+            local npc = folder:FindFirstChild("Jin Mori")
             if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
                 return npc
             end
@@ -1184,3 +1184,4 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
