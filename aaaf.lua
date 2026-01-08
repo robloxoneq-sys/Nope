@@ -876,10 +876,10 @@ TabAutoFarm:AddToggle("AutoFarmBossAll", {
     end
 })
 
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 local Count = 1200
+
+local AutoBuySummonOrb = false
+local AutoBuyTask
 
 local function pressEnterAllAtOnce(totalPresses)
     for i = 1, totalPresses do
@@ -905,15 +905,29 @@ local function buySummonOrb()
     GuiService.SelectedObject = nil
 end
 
-task.spawn(function()
-    while true do
-        local currentSummonOrb = player:FindFirstChild("Inventory") and player.Inventory:FindFirstChild("Summon Orb")
-        if not currentSummonOrb or currentSummonOrb.Value < 100 then
-            buySummonOrb()
+TabAutoFarm:AddToggle("AutoBuySummonOrb_Toggle", {
+    Title = "Auto Buy Summon Orb",
+    Description = "หาก Summon Orb เหลือน้อยกว่า 100 มันจะซื้อเอง / If the Summon Orb is less than 100 remaining, it will buy itself.",
+    Default = false,
+    Callback = function(state)
+        AutoBuySummonOrb = state
+
+        if state then
+            AutoBuyTask = task.spawn(function()
+                while AutoBuySummonOrb do
+                    local currentSummonOrb = player:FindFirstChild("Inventory")
+                        and player.Inventory:FindFirstChild("Summon Orb")
+
+                    if not currentSummonOrb or currentSummonOrb.Value < 100 then
+                        buySummonOrb()
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
         end
-        task.wait(1)
     end
-end)
+})
 
 
 TabAutoFarm:AddButton({
@@ -1184,4 +1198,3 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
