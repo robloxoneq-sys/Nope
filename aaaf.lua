@@ -920,9 +920,9 @@ local function FindBoss(name)
         local folder = workspace.Main.Characters["Rogue Town [Backside]"]:FindFirstChild("Boss")
         return folder and folder:FindFirstChild("Silver Fang")
 
-    elseif name == "Anos" then
+    elseif name == "Jin Mori" then
         local folder = workspace.Main.Characters["Abyss Hill [Upper]"]:FindFirstChild("Boss")
-        return folder and folder:FindFirstChild("Anos")
+        return folder and folder:FindFirstChild("Jin Mori")
 
     elseif name == AkazaBoss then
         local throne = workspace.Main.Characters:FindFirstChild("Throne Isle")
@@ -1004,7 +1004,7 @@ end
 
 local BossList = {
     "Yuta",
-    "Anos",
+    "Jin Mori",
     "Sung Jin Woo",
     "Silver Fang"
 }
@@ -1392,3 +1392,4 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
+
