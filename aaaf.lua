@@ -1059,6 +1059,7 @@ TabAutoFarm:AddToggle("AutoFarmBossAll", {
     end
 })
 
+local playerGui = player:WaitForChild("PlayerGui")
 local Count = 1200
 
 local AutoBuySummonOrb = false
