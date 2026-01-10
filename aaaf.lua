@@ -1163,6 +1163,62 @@ TabAutoFarm:AddToggle("HideQuestCancel_Toggle", {
     end
 })
 
+local RunService = game:GetService("RunService")
+
+-- สถานะ Toggle สำหรับบอสแต่ละตัว
+local InstantKillSukunaEnabled = false
+local InstantKillGojoEnabled = false
+
+-- ฟังก์ชัน Instant Kill
+local function InstantKillBoss(bossName)
+    local bossFolder = workspace:WaitForChild("Main")
+        :WaitForChild("Characters")
+        :WaitForChild("Throne Isle")
+        :WaitForChild("Boss")
+
+    local boss = bossFolder:FindFirstChild(bossName)
+    if boss then
+        local humanoid = boss:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            local healthPercent = humanoid.Health / humanoid.MaxHealth * 100
+            if healthPercent <= 70 then
+                humanoid.Health = 0
+            end
+        end
+    end
+end
+
+-- Loop เช็คบอสตลอดเวลา
+task.spawn(function()
+    while true do
+        if InstantKillSukunaEnabled then
+            InstantKillBoss("Sukuna Shibuya")
+        end
+        if InstantKillGojoEnabled then
+            InstantKillBoss("Gojo Shibuya")
+        end
+        wait(0.5)
+    end
+end)
+
+-- ตัวอย่าง Toggle UI
+TabAutoFarm:AddToggle("InstantKillSukunaToggle", {
+    Title = "Testing but can use Instant Kill Sukuna",
+    Default = false,
+    Callback = function(state)
+        InstantKillSukunaEnabled = state
+    end
+})
+
+TabAutoFarm:AddToggle("InstantKillGojoToggle", {
+    Title = "Testing but can use  Instant Kill Gojo",
+    Default = false,
+    Callback = function(state)
+        InstantKillGojoEnabled = state
+    end
+})
+
+
 
 
 local Section = TabAutoFarm:AddSection("Select Auto Skill")
