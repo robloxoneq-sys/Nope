@@ -703,11 +703,7 @@ TabAutoFarm:AddToggle("SingleBoss_Toggle", {
     end
 })
 local Section = TabAutoFarm:AddSection("Select Boss Spawn")
-local BossList = {
-    "Gojo","Sukuna","Akaza","David",
-    "Todoroki","Gojo Shibuya","Sukuna Shibuya"
-}
-
+local BossList = {"Gojo", "Sukuna", "Akaza", "David", "Todoroki","Gojo Shibuya","Sukuna Shibuya"}
 getgenv().SelectedBoss = "Gojo"
 getgenv().AutoSpawnEnabled = false
 getgenv().AutoKillEnabled = false
@@ -715,32 +711,19 @@ getgenv().AutoKillEnabled = false
 local KillLoopRunning = false
 local originalPos
 
-local function CanRunBoss()
-    local pity = LocalPlayer:WaitForChild("Pity", 5)
-    local boss = pity and pity:WaitForChild("Boss", 5)
-    return boss and boss.Value >= 25
-end
-
-local function getBossUI()
-    return LocalPlayer.PlayerGui
-        :WaitForChild("Button")
-        :WaitForChild("Boss Spawn")
-end
-
 local function openBossUI()
-    if not CanRunBoss() then return end
-    local gui = getBossUI()
+    local gui = LocalPlayer.PlayerGui:WaitForChild("Button"):WaitForChild("Boss Spawn")
     gui.Visible = true
 end
 
 local function getSelectButton()
-    local gui = getBossUI()
-    local frame = gui:WaitForChild("Frame"):FindFirstChild(getgenv().SelectedBoss)
-    if not frame then return nil end
-    return frame:FindFirstChild("Button")
+    local ok, btn = pcall(function()
+        return LocalPlayer.PlayerGui.Button["Boss Spawn"].Frame[getgenv().SelectedBoss].Button
+    end)
+    return ok and btn or nil
 end
 
-local function isSelectedBossAlive()
+local function isAnyBossAlive()
     local throne = workspace:FindFirstChild("Main")
         and workspace.Main.Characters:FindFirstChild("Throne Isle")
 
@@ -748,42 +731,53 @@ local function isSelectedBossAlive()
         return false
     end
 
-    local npc = throne.Boss:FindFirstChild(getgenv().SelectedBoss)
-    return npc
-        and npc:FindFirstChild("Humanoid")
-        and npc.Humanoid.Health > 0
+    for _, name in ipairs(BossList) do
+        local npc = throne.Boss:FindFirstChild(name)
+        if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- ตรวจสอบว่า Pity ครบ 25 หรือไม่
+local function canSpawnBoss()
+    local pity = LocalPlayer:FindFirstChild("Pity") and LocalPlayer.Pity:FindFirstChild("Boss")
+    if not pity then return false end
+    return pity.Value >= 25
 end
 
 local function spawnBoss()
-    if not CanRunBoss() then return end
+    -- เช็ค Pity ก่อน spawn
+    if not canSpawnBoss() then return end
 
     openBossUI()
-    task.wait(0.3)
-
-    local selectBtn = getSelectButton()
-    if not selectBtn then return end
-
-    GuiService.SelectedObject = selectBtn
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-
     task.wait(0.2)
 
-    local spawnBtn = getBossUI():WaitForChild("Spawn"):WaitForChild("Button")
-    GuiService.SelectedObject = spawnBtn
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+    local selectBtn = getSelectButton()
+    if selectBtn then
+        GuiService.SelectedObject = selectBtn
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+        task.wait()
+    end
 
-    task.wait(0.1)
+    local spawnBtn = LocalPlayer.PlayerGui.Button["Boss Spawn"].Spawn:FindFirstChild("Button")
+    if spawnBtn then
+        GuiService.SelectedObject = spawnBtn
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+    end
+
+    task.wait()
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.BackSlash, false, game)
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.BackSlash, false, game)
 end
 
 task.spawn(function()
     while true do
-        if getgenv().AutoSpawnEnabled
-            and CanRunBoss()
-            and not isSelectedBossAlive() then
+        if getgenv().AutoSpawnEnabled and not isAnyBossAlive() and canSpawnBoss() then
             spawnBoss()
         end
         task.wait(1)
@@ -801,8 +795,8 @@ local function stayBehind(npc, hrp)
     local bossHRP = npc:FindFirstChild("HumanoidRootPart")
     if not bossHRP then return end
 
-    local pos = bossHRP.Position - bossHRP.CFrame.LookVector * 8
-    hrp.CFrame = CFrame.new(pos, bossHRP.Position)
+    local backPos = bossHRP.Position - bossHRP.CFrame.LookVector * 8
+    hrp.CFrame = CFrame.new(backPos, bossHRP.Position)
 end
 
 local function attackOnce()
@@ -820,24 +814,23 @@ local function KillLoop()
     KillLoopRunning = true
 
     while getgenv().AutoKillEnabled do
-        if not CanRunBoss() then
-            task.wait(0.5)
-            continue
-        end
-
         local hrp, humanoid = getCharacterHRP()
-        if not hrp or humanoid.Health <= 0 then
+        if not hrp or not humanoid or humanoid.Health <= 0 then
             task.wait(0.5)
             continue
         end
 
-        local throne = workspace.Main.Characters["Throne Isle"]
-        local npc = throne.Boss:FindFirstChild(getgenv().SelectedBoss)
+        local throne = workspace:FindFirstChild("Main")
+            and workspace.Main.Characters:FindFirstChild("Throne Isle")
 
-        if npc and npc:FindFirstChild("Humanoid")
-            and npc.Humanoid.Health > 0 then
-            stayBehind(npc, hrp)
-            attackOnce()
+        if throne and throne:FindFirstChild("Boss") then
+            for _, bossName in ipairs(BossList) do
+                local npc = throne.Boss:FindFirstChild(bossName)
+                if npc and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
+                    stayBehind(npc, hrp)
+                    attackOnce()
+                end
+            end
         end
 
         task.wait(0.05)
@@ -858,7 +851,6 @@ local Dropdown = TabAutoFarm:AddDropdown("BossSelect", {
     Values = BossList,
     Default = 1
 })
-
 Dropdown:OnChanged(function(v)
     getgenv().SelectedBoss = v
 end)
@@ -867,11 +859,9 @@ TabAutoFarm:AddToggle("AutoSpawnBoss", {
     Title = "Auto Spawn Boss",
     Default = false
 }):OnChanged(function(state)
-    if state and not CanRunBoss() then return end
-
     getgenv().AutoSpawnEnabled = state
 
-    local gui = getBossUI()
+    local gui = LocalPlayer.PlayerGui.Button["Boss Spawn"]
     if state then
         originalPos = originalPos or gui.Position
         gui.Position = UDim2.new(0.5, 0, 0.1, 0)
@@ -883,16 +873,15 @@ TabAutoFarm:AddToggle("AutoSpawnBoss", {
 end)
 
 TabAutoFarm:AddToggle("AutoKillBosses", {
-    Title = "Auto Kill Boss",
+    Title = "Auto Kill All Bosses",
     Default = false
 }):OnChanged(function(state)
-    if state and not CanRunBoss() then return end
-
     getgenv().AutoKillEnabled = state
     if state then
         KillLoop()
     end
 end)
+
 
 
 
@@ -1392,4 +1381,3 @@ InterfaceManager:BuildInterfaceSection(Setting)
 SaveManager:BuildConfigSection(Setting)
 Window:SelectTab(1)
 ---------------------------------------------------
-
